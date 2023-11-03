@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -11,10 +12,12 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController phNoController = TextEditingController();
-  TextEditingController otpController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   final scaffoldkey = GlobalKey<ScaffoldState>();
-
+  final formKey = GlobalKey<FormState>();
+  bool loading = false;
+  UserCredential? userCredential;
   var temp;
   bool visible = false;
   @override
@@ -26,84 +29,127 @@ class _SignUpScreenState extends State<SignUpScreen> {
             'Sign Up',
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: phNoController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+        body: (!loading)
+            ? Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          controller: emailController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Please Enter your email';
+                            } else {
+                              return null;
+                            }
+                          },
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          controller: passwordController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                                 validator: (value) {
+                            if (value == null) {
+                              return 'Please Enter your password';
+                            } else {
+                              return null;
+                            }
+                          },
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            createUserWithEmailAndPassword(
+                              emailController.text,
+                              passwordController.text,
+                            );
+                          },
+                          child: const Text(
+                            'Create Account',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        visible = !visible;
-                      });
-                      temp = await sendOTP(phNoController.text);
-                    },
-                    child: const Text(
-                      'Send Otp',
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: otpController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      authenticate(temp, otpController.text, context);
-                    },
-                    child: const Text(
-                      'Submit Otp',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+                ),
+              )
+            : const LoadingScreen(),
       ),
     );
   }
 
-  String phoneNumber = "";
-
-  sendOTP(String phoneNumber) async {
-    this.phoneNumber = phoneNumber;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    ConfirmationResult result = await auth.signInWithPhoneNumber(
-      '+91$phoneNumber',
-    );
-    return result;
+// Firebase Create User
+  Future<void> createUserWithEmailAndPassword(
+      String emailController, String passwordController) async {
+    if (formKey.currentState!.validate()) {
+      setState(() => loading = true);
+      try {
+        const LoadingScreen();
+        userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: emailController.toString(),
+                password: passwordController.toString())
+            .whenComplete(() {
+          FirebaseAuth userCredential = FirebaseAuth.instance;
+          FirebaseFirestore.instance.collection('User').doc().set({
+            'email': emailController,
+            'uid': userCredential.currentUser!.uid,
+            'password': passwordController,
+            'register_time': FieldValue.serverTimestamp(),
+          });
+        }).whenComplete(() {
+          const snackBar = SnackBar(
+              content: Text(
+            "Your account has been Created",
+          ));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
+        Navigator.pushNamed(context, '/signInScreen');
+      } on FirebaseAuthException catch (e) {
+        loading = false;
+        if (e.code == 'weak-password') {
+          loading = false;
+          Navigator.pop(context);
+          const snackBar = SnackBar(
+              content: Text(
+            'Your Password too weak,\nPlease make sure your password more than 6 characters',
+          ));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        } else if (e.code == 'email-already-in-use') {
+          Navigator.pop(context);
+          const snackBar = SnackBar(
+              content: Text(
+            'Oh no! It seems like this email is already Registered.',
+          ));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      const LoadingScreen();
+    }
   }
+}
 
-  authenticate(ConfirmationResult confirmationResult, String otp,
-      BuildContext context) async {
-    UserCredential userCredential = await confirmationResult.confirm(otp);
-    userCredential.additionalUserInfo!.isNewUser
-        ? printMessage("Authentication Successful", context)
-        : printMessage("User already exists", context);
-  }
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key});
 
-  printMessage(String msg, BuildContext context) {
-    var snackbar = SnackBar(
-      content: Text(msg),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  @override
+  Widget build(BuildContext context) {
+    return const CircularProgressIndicator();
   }
 }
