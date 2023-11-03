@@ -35,53 +35,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          controller: emailController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextFormField(
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please Enter your email';
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
-                          validator: (value) {
-                            if (value == null) {
-                              return 'Please Enter your email';
-                            } else {
-                              return null;
-                            }
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          controller: passwordController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
+                          const SizedBox(
+                            height: 20,
                           ),
-                                 validator: (value) {
-                            if (value == null) {
-                              return 'Please Enter your password';
-                            } else {
-                              return null;
-                            }
-                          },
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            createUserWithEmailAndPassword(
-                              emailController.text,
-                              passwordController.text,
-                            );
-                          },
-                          child: const Text(
-                            'Create Account',
+                          TextFormField(
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            controller: passwordController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                            ),
+                                   validator: (value) {
+                              if (value == null) {
+                                return 'Please Enter your password';
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
-                        ),
-                      ],
+                          ElevatedButton(
+                            onPressed: () async {
+                              createUserWithEmailAndPassword(
+                                emailController.text,
+                                passwordController.text,
+                              );
+                            },
+                            child: const Text(
+                              'Create Account',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -110,6 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             'password': passwordController,
             'register_time': FieldValue.serverTimestamp(),
           });
+          
         }).whenComplete(() {
           const snackBar = SnackBar(
               content: Text(

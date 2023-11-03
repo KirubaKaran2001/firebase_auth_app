@@ -32,34 +32,37 @@ class _SignInScreenState extends State<SignInScreen> {
           child: Card(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: passwordController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    const SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      signIn(emailController.text, passwordController.text);
-                    },
-                    child: const Text(
-                      'Login',
+                    TextFormField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                ],
+                    ElevatedButton(
+                      onPressed: () async {
+                        signIn(emailController.text, passwordController.text);
+                      },
+                      child: const Text(
+                        'Login',
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

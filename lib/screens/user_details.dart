@@ -14,6 +14,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController companyNameController = TextEditingController();
   TextEditingController addressController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -68,7 +69,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                     FirebaseAuth userCredential = FirebaseAuth.instance;
                     FirebaseFirestore.instance.collection('User').doc().set({
                       'uid': userCredential.currentUser!.uid,
-                      'email': emailController,
                       'name': nameController.text.toString(),
                       'company_name': companyNameController,
                       'address': addressController,
