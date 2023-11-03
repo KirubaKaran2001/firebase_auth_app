@@ -42,10 +42,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             controller: emailController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
+                              labelText: 'Email',
                             ),
                             validator: (value) {
                               if (value == null) {
@@ -59,18 +61,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             height: 20,
                           ),
                           TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             controller: passwordController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
+                              labelText: 'Password',
                             ),
-                                   validator: (value) {
+                            validator: (value) {
                               if (value == null) {
                                 return 'Please Enter your password';
                               } else {
                                 return null;
                               }
                             },
+                          ),
+                          const SizedBox(
+                            height: 20,
                           ),
                           ElevatedButton(
                             onPressed: () async {
@@ -89,7 +96,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
               )
-            : const LoadingScreen(),
+            : const Center(child: LoadingScreen()),
       ),
     );
   }
@@ -113,7 +120,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             'password': passwordController,
             'register_time': FieldValue.serverTimestamp(),
           });
-          
         }).whenComplete(() {
           const snackBar = SnackBar(
               content: Text(

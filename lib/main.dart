@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const SignInScreen(),
+      debugShowCheckedModeBanner: false,
       onGenerateRoute: (RouteSettings settings) {
         debugPrint('build route for ${settings.name}');
         var routes = <String, WidgetBuilder>{

@@ -27,46 +27,54 @@ class _SignInScreenState extends State<SignInScreen> {
             'Sign In',
           ),
         ),
-        body:(!loading)? Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      controller: emailController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+        body: (!loading)
+            ? Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextFormField(
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Email',
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextFormField(
+                            controller: passwordController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Password',
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              signIn(emailController.text,
+                                  passwordController.text);
+                            },
+                            child: const Text(
+                              'Login',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      controller: passwordController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        signIn(emailController.text, passwordController.text);
-                      },
-                      child: const Text(
-                        'Login',
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ):const LoadingScreen(),
+              )
+            : const Center(child: LoadingScreen()),
       ),
     );
   }
